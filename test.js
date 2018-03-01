@@ -1,9 +1,10 @@
-const crc8 = require ('uartCommCRC8');
+const crc8 = require ('./uartCommCRC8');
 
 const dgram = require('dgram');
 const dsComm = dgram.createSocket("udp4");
 dsComm.bind(8888);
 
+let discoveredDS = []; // Put in all discovered DS.
 
 function sendCommand(ip, command){
     let header = [0xFC, (command.length + 1)];
@@ -17,18 +18,20 @@ function sendCommand(ip, command){
     });
 }
 
+function isObject (a) {
+	return (!!a) && (a.constructor === Object);
+};
 
 
 dsComm.on('message', (msg, rinfo) => {
 
     console.log(`server got message from ${rinfo.address}:${rinfo.port}`);
     console.log('Start of pckt:  0x' + msg[0].toString(16));
-    console.log('pckt length:    ' + msg[1]);
+    console.log('pckt length:      ' + msg[1]);
     console.log('Group Address:  0x' + msg[2].toString(16));
     console.log('Flag hex:       0x' + msg[3].toString(16));
     console.log('Command Upper:  0x' + msg[4].toString(16));
     console.log('Command Lower:  0x' + msg[5].toString(16));
-
     console.log('Hardware Type:    ' + msg[msg.length - 1]);
     
     if (msg[3] == 96) {
@@ -36,48 +39,54 @@ dsComm.on('message', (msg, rinfo) => {
         if ( msg[msg.length - 1] == 1){ console.log('Detected DreamScreen HD');};
         if ( msg[msg.length - 1] == 2){ console.log('Detected DreamScreen 4K');};
         if ( msg[msg.length - 1] == 3){ console.log('Detected SideKick');};
-        // Cleanup code above and add else. (unsupported device).
+        // Cleanup code above and add else. and test.... (unsupported device).
 
-        console.log(`Server got discovery response.`);
-        console.log(' Device name:   ' + subBufferString(6,16,msg));
-        console.log(' Group name:    ' + subBufferString(22,16,msg));
-        console.log(' Group number:  ' + msg[38]);
-        console.log(' Mode:          ' + msg[39]);
-        console.log(' Brightness:    ' + msg[40]);
-        console.log(' Ambient R:     ' + msg[46]);
-        console.log(' Ambient G:     ' + msg[47]);
-        console.log(' Ambient B:     ' + msg[48]);
-        console.log(' Ambient Scene: ' + msg[68]);
-        console.log(' HDMI Input:    ' + msg[79]);
-        console.log(' HDMI Name 1:   ' + subBufferString(81,16,msg));
-        console.log(' HDMI Name 2:   ' + subBufferString(97,16,msg));
-        console.log(' HDMI Name 3:   ' + subBufferString(113,16,msg));
-        console.log(' HDMI Active:   ' + msg[135]);
+
+        //Adding HD or 4K
+        const devicename = subBufferString(6,16,msg);
+        if (!isObject(discoveredDS[devicename])){ //If the device is "new"
+            discoveredDS[devicename] = newDsObject(devicename);
+        }
+
+        discoveredDS[devicename].groupname = subBufferString(6,16,msg);
+        discoveredDS[devicename].groupnumber = msg[38];
+        discoveredDS[devicename].mode = msg[39];
+        discoveredDS[devicename].brightness = msg[40];
+        discoveredDS[devicename].ambientr = msg[46];
+        discoveredDS[devicename].ambientg = msg[47];
+        discoveredDS[devicename].ambientb = msg[48];
+        discoveredDS[devicename].ambientscene = msg[68];
+        discoveredDS[devicename].hdmiinput = msg[79];
+        discoveredDS[devicename].hdminame1 = subBufferString(81,16,msg);
+        discoveredDS[devicename].hdminame2 = subBufferString(97,16,msg);
+        discoveredDS[devicename].hdminame3 = subBufferString(113,16,msg);
+        discoveredDS[devicename].hdmiactive = msg[135];
+        discoveredDS[devicename].lastseen = Date.now();
+        discoveredDS[devicename].reachable = true;
     }
     console.log('');
+
 });  
 
-function newDsObject(key){
+function newDsObject(devicename){
     return {
-        key:{
-            devicetype:0,
-            devicename:"",
-            groupname:"",
-            groupnumber:0,
-            mode:0,
-            brightness:0,
-            ambientr:0,
-            ambientg:0,
-            ambientb:0,
-            ambientscene:0,
-            hdmiinput:0,
-            hdminame1:"",
-            hdminame2:"",
-            hdminame3:"",
-            hdmiactive:"",
-            lastseen:0,
-            reachable:false
-        }
+        devicetype:0,
+        devicename,
+        groupname:"",
+        groupnumber:0,
+        mode:0,
+        brightness:0,
+        ambientr:0,
+        ambientg:0,
+        ambientb:0,
+        ambientscene:0,
+        hdmiinput:0,
+        hdminame1:"",
+        hdminame2:"",
+        hdminame3:"",
+        hdmiactive:"",
+        lastseen:0,
+        reachable:false
     }
 }
 

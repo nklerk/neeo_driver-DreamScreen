@@ -1,16 +1,30 @@
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+// This code is a work in progress test envirement to build a working NEEO driver.
+// At this point it is shared so others can read and copy my code if they like.
+// This code is far from being a complete driver.
+//
+// Niels de klerk
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+//CRC8 for checksum
 const crc8 = require ('./uartCommCRC8');
 
+//DreamScreen server.
 const dgram = require('dgram');
 const dsComm = dgram.createSocket("udp4");
 dsComm.bind(8888);
 
+//Let there be an empty memory based "database"
 let discoveredDS = []; // Put in all discovered DS.
 
+//Function to send commands. (Low level)
 function sendCommand(ip, command){
     let header = [0xFC, (command.length + 1)];
     let data = header.concat(command);
     data.push(crc8.calculate(data));
-    //printHex(data)
     let message = new Buffer(data);
     dsComm.on('listening', function(){
         dsComm.setBroadcast(true);
@@ -18,13 +32,16 @@ function sendCommand(ip, command){
     });
 }
 
+//Function to test if something is an object.
 function isObject (a) {
 	return (!!a) && (a.constructor === Object);
 };
 
 
+//If a UDP packet is received.
 dsComm.on('message', (msg, rinfo) => {
 
+    // Printing debug info.
     console.log(`server got message from ${rinfo.address}:${rinfo.port}`);
     console.log('Start of pckt:  0x' + msg[0].toString(16));
     console.log('pckt length:      ' + msg[1]);
@@ -34,15 +51,20 @@ dsComm.on('message', (msg, rinfo) => {
     console.log('Command Lower:  0x' + msg[5].toString(16));
     console.log('Hardware Type:    ' + msg[msg.length - 1]);
     
+
+    //If response code (HD/4K) is a reply to discover message. (hex 0x60, dec 96)
     if (msg[3] == 96) {
 
+
+        // DS type detection must be tested and cleaned
+        // add else. and test.... (include unsupported device).
         if ( msg[msg.length - 1] == 1){ console.log('Detected DreamScreen HD');};
         if ( msg[msg.length - 1] == 2){ console.log('Detected DreamScreen 4K');};
         if ( msg[msg.length - 1] == 3){ console.log('Detected SideKick');};
-        // Cleanup code above and add else. and test.... (unsupported device).
+        
 
 
-        //Adding HD or 4K
+        //Adding HD or 4K to the discoveredDS "database"
         const devicename = subBufferString(6,16,msg);
         if (!isObject(discoveredDS[devicename])){ //If the device is "new"
             discoveredDS[devicename] = newDsObject(devicename);
@@ -68,6 +90,8 @@ dsComm.on('message', (msg, rinfo) => {
 
 });  
 
+//Function to create a new DS Object with all parameters i want to use in the driver.
+//Object KEY will be the device name so controlling a device is possible by its name as a reference.
 function newDsObject(devicename){
     return {
         devicetype:0,
@@ -90,14 +114,18 @@ function newDsObject(devicename){
     }
 }
 
+//Function to get a specific string from a buffer.
 function subBufferString(_startIndex, _length, _data){
     let data = "";
     for (var i=_startIndex; i<_startIndex+_length; i++) {
         data = data + String.fromCharCode(_data[i]);
     }
-    return data;
+    return String.trim(data);
 }
 
+
+
+// Function used in debugging, can be removed...
 function printHex(data){
     let strData = '';
     for (i in data){
@@ -107,13 +135,22 @@ function printHex(data){
     console.log ('Sending data: '+strData);
 }
 
+
+//Function used to send a discover packet.
 function ds_Discover() {
     sendCommand('255.255.255.255', [0xFF,0x30,0x01,0x0a]);
 }
 
+//Function to sent Video command to specific IP. (Must be based on name opposed to IP as DHCP can break function in longer used situations.)
 function ds_Video(ip) {
     sendCommand(ip, [0xFF,0x11,0x03,0x01,0x01]);
 }
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Below is the Code To test stuff....
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 ds_Discover();
 //ds_Video('10.2.1.223');

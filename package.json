@@ -5,6 +5,10 @@
   "repository": "https://github.com/nklerk/neeo_driver-DreamScreen",
   "license": "MIT",
   "private": false,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Niels de Klerk",
   "dependencies": {
     "dreamscreen-node": "*",
     "neeo-sdk": "^0.48.13"

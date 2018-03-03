@@ -67,7 +67,7 @@ const ds4k = neeosdk.buildDevice('4K')
   .registerInitialiseFunction(controller.initialise)
 ;
 
-const ds4k = neeosdk.buildDevice('SideKick')
+const dssk = neeosdk.buildDevice('SideKick')
   .setManufacturer('DreamScreen')
   .addAdditionalSearchToken('Spot')
   .setType('LIGHT')
@@ -91,7 +91,7 @@ neeosdk.discoverOneBrain()
       brain,
       port: 6336,
       name: 'DreamScreen',
-      devices: [dshd, ]
+      devices: [dshd, ds4k, dssk]
     });
   })
   .then(() => {

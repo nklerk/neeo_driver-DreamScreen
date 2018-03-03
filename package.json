@@ -3,13 +3,10 @@
   "version": "0.0.1",
   "description": "NEEO driver, DreamScreen",
   "repository": "https://github.com/nklerk/neeo_driver-DreamScreen",
-  "license": "",
+  "license": "MIT",
   "private": false,
   "dependencies": {
-    "neeo-sdk": "*",
-    "dreamscreen-node": "*"
-  },
-  "engines": {
-    "node": ">=6.0.0"
+    "dreamscreen-node": "*",
+    "neeo-sdk": "^0.48.13"
   }
 }

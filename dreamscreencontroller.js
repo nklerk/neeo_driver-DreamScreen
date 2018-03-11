@@ -1,6 +1,7 @@
 'use strict';
 
-const DreamscreenService = require('./dreamscreenservice');
+//const DreamscreenService = require('./dreamscreenservice');
+const dreamscreenService = require('./dreamscreenservice');
 const neeoapi = require('neeo-sdk');
 
 // the mobile app polls each 4500ms
@@ -9,12 +10,18 @@ const MACRO_POWER_ON = 'POWER ON';
 const MACRO_POWER_OFF = 'POWER OFF';
 const MACRO_POWER_TOGGLE = 'POWER_TOGGLE';
 const MACRO_ALERT = 'ALERT';
+const INPUT_HDMI_1 = 'INPUT_HDMI_1';
+const INPUT_HDMI_2 = 'INPUT_HDMI_2';
+const INPUT_HDMI_3 = 'INPUT_HDMI_3';
+const MODE_MUSIC = 'MODE_MUSIC';
+const MODE_VIDEO = 'MODE_VIDEO';
+const MODE_AMBIENT = 'MODE_AMBIENT';
 const COMPONENT_BRIGHTNESS = 'brightness';
 const COMPONENT_POWER = 'power';
 const COMPONENT_AMBIENTLIGHT = 'ambientlight';
 
 const deviceState = neeoapi.buildDeviceState();
-let dreamscreenService;
+//let dreamscreenService;
 let sendMessageToBrainFunction;
 let pollingIntervalId;
 
@@ -48,10 +55,10 @@ module.exports.onButtonPressed = (action, deviceId) => {
   switch (action) {
     case MACRO_POWER_ON:
       console.log(`Powering on ${deviceId}`);
-      return dreamscreenService.setPowerState(deviceId, true); //Change to correct function
+      return dreamscreenService.setPowerState(deviceId, "true"); //Change to correct function
     case MACRO_POWER_OFF:
       console.log(`Powering off ${deviceId}`);
-      return dreamscreenService.setPowerState(deviceId, false); //Change to correct function
+      return dreamscreenService.setPowerState(deviceId, "false"); //Change to correct function
     case INPUT_HDMI_1:
       console.log(`Set input to HDMI 1 on ${deviceId}`);
       return dreamscreenService.setInput(deviceId, 1);  //Change to correct function
@@ -78,13 +85,14 @@ module.exports.onButtonPressed = (action, deviceId) => {
 
 module.exports.discoverDevices = function() {
   console.log('discovery call');
-  const allDevices = deviceState.getAllDevices();
-  return allDevices
+  
+  const allDevices = dreamscreenService.allDevices();
+  return dreamscreenService.allDevices()
     .map((deviceEntry) => {
       return {
-        id: deviceEntry.id,
-        name: deviceEntry.clientObject.label,
-        reachable: deviceEntry.reachable
+        id: deviceEntry.serialNumber,
+        name: deviceEntry.name,
+        reachable: deviceEntry.isReachable
       };
     });
 };
@@ -126,6 +134,6 @@ module.exports.initialise = function() {
     return false;
   }
   console.log('initialise dreamscreen service, start polling');
-  dreamscreenService = new DreamscreenService(deviceState);
+  //dreamscreenService = new DreamscreenService(deviceState);
   pollingIntervalId = setInterval(pollAllDreamscreenDevices, DEVICE_POLL_TIME_MS);
 };

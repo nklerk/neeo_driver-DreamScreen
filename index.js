@@ -88,7 +88,7 @@ neeosdk.discoverOneBrain()
 
     console.log('- Start server');
     return neeosdk.startServer({
-      brain,
+      brain: '10.2.1.64',
       port: 6336,
       name: 'DreamScreen',
       devices: [dshd, ds4k, dssk]

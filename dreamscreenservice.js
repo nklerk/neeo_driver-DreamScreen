@@ -1,144 +1,85 @@
 'use strict';
 
 const BluePromise = require('bluebird');
-const DreamscreenDeps = require('./dreamscreendeps');
-
+const DreamscreenClient = require('dreamscreen-node').Client;
+const client = new DreamscreenClient();
 const POWER_ON_INTEGER = 1;
 
 
-class DreamscreenService {
+client.on('light-new', (dreamscreen) => {
+  console.log('discovered new light', dreamscreen.serialNumber);
+  //deviceState.addDevice(dreamscreen.serialNumber, dreamscreen);
+});
 
-  constructor(deviceState) {
-    this.deviceState = deviceState;
-    this.dreamscreenClient = DreamscreenDeps.buildDreamscreenClientInstance();
-    this.dreamscreenClient.init();
+client.on('light-online', (dreamscreen) => {
+  console.log('light-online', dreamscreen.serialNumber);
+  deviceState.updateReachable(dreamscreen.serialNumber, true);
+});
 
-    console.log('DREAMSCREEN discovery started...');
-    this.dreamscreenClient.on('light-new', (dreamscreen) => {
-      console.log('discovered new light', dreamscreen.id);
-      deviceState.addDevice(dreamscreen.id, dreamscreen);
-    });
-    this.dreamscreenClient.on('light-online', (dreamscreen) => {
-      console.log('light-online', dreamscreen.id);
-      deviceState.updateReachable(dreamscreen.id, true);
-    });
-    this.dreamscreenClient.on('light-offline', (dreamscreen) => {
-      console.log('light-offline', dreamscreen.id);
-      deviceState.updateReachable(dreamscreen.id, false);
-    });
+client.on('light-offline', (dreamscreen) => {
+  console.log('light-offline', dreamscreen.serialNumber);
+  //deviceState.updateReachable(dreamscreen.serialNumber, false);
+});
+
+client.on('listening', function () {
+  var address = client.address();
+  console.log(
+      'Started DreamScreen listening on ' +
+      address.address + ':' + address.port + '\n'
+  );
+});
+
+
+client.init();
+
+module.exports.allDevices = function allDevices(){
+  let devices = [];
+  for (let id in client.devices) {
+    devices.push(client.devices[id]);
   }
-
-  stop() {
-    this.dreamscreenClient.destroy();
-  }
+  return devices;
+}
 
 
-  getState(deviceId) {
-    const light = this.deviceState.getClientObjectIfReachable(deviceId);
-    if (!light) {
-      return BluePromise.reject(new Error('NOT_REACHABLE'));
-    }
+module.exports.getPowerState = function getPowerState(deviceId) {
+  console.log("== Controller requested PowerState of: "+deviceId);
+}
 
-    function getLampState() {
-      return new BluePromise((resolve, reject) => {
-        console.log('fetch new DREAMSCREEN state', deviceId);
-        light.getState((err, state) => {
-          if (err) {
-            reject(err);
-          }
-          if (!state || !state.color) {
-            reject(new Error('INVALID_ANSWER'));
-          }
-          resolve(state);
-        });
-      });
-    }
+module.exports.getBrightness = function getBrightness(deviceId) {
+  console.log("== Controller requested Brightness of: "+deviceId);
+}
 
-    return this.deviceState
-      .getCachePromise(deviceId)
-      .getValue(getLampState);
-  }
-
-  getBrightness(deviceId) {
-    return this.getState(deviceId)
-      .then((state) => {
-        return state.brightness;
-      });
-  }
-
-  setBrightness(deviceId, brightnessString) {
-    return new BluePromise((resolve, reject) => {
-      const brightness = parseInt(brightnessString, 10);
-      const light = this.deviceState.getClientObjectIfReachable(deviceId);
-      if (!light) {
-        return reject(new Error('NOT_REACHABLE'));
-      }
-      light.brightness(brightness);
-      resolve();
-    });
-  }
-
-  setInput(deviceId, input) {
-    return new BluePromise((resolve, reject) => {
-      const input = parseInt(input, 10);
-      const light = this.deviceState.getClientObjectIfReachable(deviceId);
-      if (!light) {
-        return reject(new Error('NOT_REACHABLE'));
-      }
-      light.input(input);    
-    });
-  }
-
-  setMode(deviceId, mode) {
-    return new BluePromise((resolve, reject) => {
-      const mode = parseInt(mode, 10);
-      const light = this.deviceState.getClientObjectIfReachable(deviceId);
-      if (!light) {
-        return reject(new Error('NOT_REACHABLE'));
-      }
-      light.mode(mode);    
-    });
-  }
-
-  getPowerState(deviceId) {
-    return this.getState(deviceId)
-      .then((state) => {
-        return state.power === POWER_ON_INTEGER;
-      });
-  }
-
-  setPowerState(deviceId, value) {
-    return new BluePromise((resolve, reject) => {
-      console.log('setPowerState', value);
-      const light = this.deviceState.getClientObjectIfReachable(deviceId);
-      if (!light) {
-        return reject(new Error('NOT_REACHABLE'));
-      }
-      if (value === true || value === 'true') {
-        light.setMode(3);
-      } else {
-        light.setMode(0);
-      }
-      resolve();
-    });
-  }
-
-
-  getStateForPolling(deviceId) {
-    let deviceState;
-    return this.getState(deviceId)
-      .then((_deviceState) => {
-        deviceState = _deviceState;
-        return this.getAmbientLight(deviceId);
-      })
-      .then((ambientLightSensor) => {
-        return {
-          brightness: deviceState.color.brightness,
-          power: deviceState.power === POWER_ON_INTEGER,
-          ambientlight: ambientLightSensor
-        };
-      });
+module.exports.setPowerState = function setPowerState(deviceId, value) {
+  console.log("== Controller requested to set the PowerState of: "+deviceId+" to "+value);
+  if (value === "false") {
+    setMode(deviceId, 0);
+  } else {
+    setMode(deviceId, 3);
   }
 }
 
-module.exports = DreamscreenService;
+function setMode(deviceId, value) {
+  console.log("== Controller requested to set the mode of: "+deviceId+" to "+value);
+  client.light(deviceId).setMode(value, function (err) {
+    if (err) {
+      console.log(`${client.light(deviceId).name} set Mode ${value} failed`);
+    } else {
+      console.log(`${client.light(deviceId).name} set Mode ${value} success`);
+    }
+  });
+} module.exports.setMode = setMode;
+
+module.exports.setBrightness = function setBrightness(deviceId, value) {
+  console.log("== Controller requested to set Brightness of: "+deviceId);
+  client.light(deviceId).setBrightness(parseInt(value, 10), function (err) {
+    if (err) {
+      console.log(`${client.light(deviceId).name} set Brightness ${value} failed`);
+    } else {
+      console.log(`${client.light(deviceId).name} set Brightness ${value} success`);
+    }
+  });
+}
+
+module.exports.setInput = function setInput(deviceId, value) {
+  console.log("== Controller requested to set the input of: "+deviceId+" to "+value);
+}

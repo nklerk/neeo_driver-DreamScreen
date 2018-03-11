@@ -91,11 +91,18 @@ module.exports.discoverDevices = function() {
     .map((deviceEntry) => {
       return {
         id: deviceEntry.serialNumber,
-        name: deviceEntry.name,
+        name: tclean(deviceEntry.name),
         reachable: deviceEntry.isReachable
       };
     });
 };
+
+function tclean(text){
+  text = text.toString();
+  text = text.trim();
+  text = text.replace(/\0/g, '');
+  return text
+}
 
 function sendNotificationToBrain(uniqueDeviceId, component, value) {
   sendMessageToBrainFunction({ uniqueDeviceId, component, value })

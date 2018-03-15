@@ -42,22 +42,22 @@ __automate input selection and or Mode selection:__
 4. Sellect the command you want to automate.
 
 
-### Versions
+# Versions
 
-# Known issues
+## Known issues
 - no realtime status updates:
   NOTIFICATION_FAILED COMPONENTNAME_NOT_FOUND
 
-# 0.0.3
+### 0.0.3
 - Fixed HDMI input change.
 
-# 0.0.2
+### 0.0.2
 - First almost working driver
 
-# 0.0.1
+### 0.0.1
 - POC
 
 
-### SPECIAL THANKS
+# SPECIAL THANKS
 DreamScreen for supporting this project!
 Kyle Seconrd for writing the node mudule needed for this project. (https://github.com/ksecord/dreamscreen-node)

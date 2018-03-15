@@ -40,3 +40,19 @@ __automate input selection and or Mode selection:__
 2. add a command.
 3. sellect the DreamScreen.
 4. Sellect the command you want to automate.
+
+
+### Versions
+
+# Known issues
+- no realtime status updates:
+  NOTIFICATION_FAILED COMPONENTNAME_NOT_FOUND
+
+# 0.0.3
+- Fixed HDMI input change.
+
+# 0.0.2
+- First almost working driver
+
+# 0.0.1
+- POC

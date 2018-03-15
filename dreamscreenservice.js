@@ -8,17 +8,14 @@ const POWER_ON_INTEGER = 1;
 
 client.on('light-new', (dreamscreen) => {
   console.log('discovered new light', dreamscreen.serialNumber);
-  //deviceState.addDevice(dreamscreen.serialNumber, dreamscreen);
 });
 
 client.on('light-online', (dreamscreen) => {
   console.log('light-online', dreamscreen.serialNumber);
-  deviceState.updateReachable(dreamscreen.serialNumber, true);
 });
 
 client.on('light-offline', (dreamscreen) => {
   console.log('light-offline', dreamscreen.serialNumber);
-  //deviceState.updateReachable(dreamscreen.serialNumber, false);
 });
 
 client.on('listening', function () {
@@ -43,10 +40,16 @@ module.exports.allDevices = function allDevices(){
 
 module.exports.getPowerState = function getPowerState(deviceId) {
   console.log("== Controller requested PowerState of: "+deviceId);
+  if (client.light(deviceId).mode == 0 ) {
+    return false;
+  } else {
+    return true;
+  }
 }
 
 module.exports.getBrightness = function getBrightness(deviceId) {
   console.log("== Controller requested Brightness of: "+deviceId);
+  return client.light(deviceId).brightness; 
 }
 
 module.exports.setPowerState = function setPowerState(deviceId, value) {
@@ -82,4 +85,11 @@ module.exports.setBrightness = function setBrightness(deviceId, value) {
 
 module.exports.setInput = function setInput(deviceId, value) {
   console.log("== Controller requested to set the input of: "+deviceId+" to "+value);
+  client.light(deviceId).setHdmiInput(value, function (err) {
+    if (err) {
+      console.log(`${client.light(deviceId).name} set Input ${value} failed`);
+    } else {
+      console.log(`${client.light(deviceId).name} set Input ${value} success`);
+    }
+  });
 }

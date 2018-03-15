@@ -21,7 +21,6 @@ const COMPONENT_POWER = 'power';
 const COMPONENT_AMBIENTLIGHT = 'ambientlight';
 
 const deviceState = neeoapi.buildDeviceState();
-//let dreamscreenService;
 let sendMessageToBrainFunction;
 let pollingIntervalId;
 
@@ -61,13 +60,13 @@ module.exports.onButtonPressed = (action, deviceId) => {
       return dreamscreenService.setPowerState(deviceId, "false"); //Change to correct function
     case INPUT_HDMI_1:
       console.log(`Set input to HDMI 1 on ${deviceId}`);
-      return dreamscreenService.setInput(deviceId, 1);  //Change to correct function
+      return dreamscreenService.setInput(deviceId, 0);  //Change to correct function
     case INPUT_HDMI_2:
       console.log(`Set input to HDMI 2 on ${deviceId}`);
-      return dreamscreenService.setInput(deviceId, 2); //Change to correct function
+      return dreamscreenService.setInput(deviceId, 1); //Change to correct function
     case INPUT_HDMI_3:
       console.log(`Set input to HDMI 3 on ${deviceId}`);
-      return dreamscreenService.setInput(deviceId, 3); //Change to correct function
+      return dreamscreenService.setInput(deviceId, 2); //Change to correct function
     case MODE_MUSIC:
       console.log(`Set mode to music on ${deviceId}`);
       return dreamscreenService.setMode(deviceId, 2); //Change to correct function
@@ -97,9 +96,8 @@ module.exports.discoverDevices = function() {
     });
 };
 
+// must be fixed at dreamscreen-node for name and groupname
 function tclean(text){
-  text = text.toString();
-  text = text.trim();
   text = text.replace(/\0/g, '');
   return text
 }
@@ -112,22 +110,13 @@ function sendNotificationToBrain(uniqueDeviceId, component, value) {
 }
 
 function pollAllDreamscreenDevices() {
-  console.log('poll all dreamscreen devices');
-  deviceState.getAllDevices()
-    .forEach((dreamscreen) => {
-      if (!dreamscreen.reachable) {
-        return;
-      }
-      dreamscreenService
-        .getStateForPolling(dreamscreen.id)
-        .then((deviceState) => {
-          sendNotificationToBrain(dreamscreen.id, COMPONENT_BRIGHTNESS, deviceState.brightness);
-          sendNotificationToBrain(dreamscreen.id, COMPONENT_POWER, deviceState.power);
-        })
-        .catch((error) => {
-          console.log('polling failed', error.message);
-        });
-    });
+  console.log('polling all dreamscreen devices');
+  dreamscreenService.allDevices().forEach((dreamscreen) => {
+    sendNotificationToBrain(dreamscreen.serialNumber, COMPONENT_BRIGHTNESS, dreamscreen.brightness);
+    let powerstate = false;
+    if (dreamscreen.mode == 0 ) {powerstate = true};
+    sendNotificationToBrain(dreamscreen.serialNumber, COMPONENT_POWER, powerstate);
+  });
 }
 
 module.exports.registerStateUpdateCallback = function(_sendMessageToBrainFunction) {
@@ -141,6 +130,5 @@ module.exports.initialise = function() {
     return false;
   }
   console.log('initialise dreamscreen service, start polling');
-  //dreamscreenService = new DreamscreenService(deviceState);
   pollingIntervalId = setInterval(pollAllDreamscreenDevices, DEVICE_POLL_TIME_MS);
 };

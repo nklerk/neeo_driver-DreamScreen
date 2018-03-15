@@ -10,7 +10,6 @@
   },
   "author": "Niels de Klerk",
   "dependencies": {
-    "dreamscreen-node": "^0.0.2",
     "neeo-sdk": "^0.48.13"
   }
 }

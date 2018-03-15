@@ -18,7 +18,6 @@ const MODE_VIDEO = 'MODE_VIDEO';
 const MODE_AMBIENT = 'MODE_AMBIENT';
 const COMPONENT_BRIGHTNESS = 'brightness';
 const COMPONENT_POWER = 'power';
-const COMPONENT_AMBIENTLIGHT = 'ambientlight';
 
 const deviceState = neeoapi.buildDeviceState();
 let sendMessageToBrainFunction;
@@ -113,8 +112,8 @@ function pollAllDreamscreenDevices() {
   console.log('polling all dreamscreen devices');
   dreamscreenService.allDevices().forEach((dreamscreen) => {
     sendNotificationToBrain(dreamscreen.serialNumber, COMPONENT_BRIGHTNESS, dreamscreen.brightness);
-    let powerstate = false;
-    if (dreamscreen.mode == 0 ) {powerstate = true};
+    let powerstate = true;
+    if (dreamscreen.mode == 0 ) {powerstate = false};
     sendNotificationToBrain(dreamscreen.serialNumber, COMPONENT_POWER, powerstate);
   });
 }

@@ -40,12 +40,3 @@ __automate input selection and or Mode selection:__
 2. add a command.
 3. sellect the DreamScreen.
 4. Sellect the command you want to automate.
-
-Use one of the available commands:
-- Mode Off
-- Mode Video
-- Mode Music
-- Mode Ambient
-- Input HDMI 1
-- Input HDMI 2
-- Input HDMI 3

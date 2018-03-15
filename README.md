@@ -56,3 +56,8 @@ __automate input selection and or Mode selection:__
 
 # 0.0.1
 - POC
+
+
+### SPECIAL THANKS
+DreamScreen for supporting this project!
+Kyle Seconrd for writing the node mudule needed for this project. (https://github.com/ksecord/dreamscreen-node)

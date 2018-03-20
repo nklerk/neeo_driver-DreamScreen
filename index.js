@@ -6,14 +6,14 @@ const neeosdk = require('neeo-sdk');
 const controller = require('./dreamscreencontroller');
 
 const BRIGHTNESS_SLIDER = {
-  name: 'brightness',
+  name: 'BRIGHTNESS',
   label: 'Dimmer',
   range: [0, 100],
   unit: '%'
 };
 
 const POWER_SWITCH = {
-  name: 'power',
+  name: 'POWER',
   label: 'Power'
 };
 

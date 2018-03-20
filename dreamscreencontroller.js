@@ -16,8 +16,8 @@ const INPUT_HDMI_3 = 'INPUT_HDMI_3';
 const MODE_MUSIC = 'MODE_MUSIC';
 const MODE_VIDEO = 'MODE_VIDEO';
 const MODE_AMBIENT = 'MODE_AMBIENT';
-const COMPONENT_BRIGHTNESS = 'brightness';
-const COMPONENT_POWER = 'power';
+const COMPONENT_BRIGHTNESS = 'BRIGHTNESS';
+const COMPONENT_POWER = 'POWER';
 
 const deviceState = neeoapi.buildDeviceState();
 let sendMessageToBrainFunction;
@@ -102,6 +102,9 @@ function tclean(text){
 }
 
 function sendNotificationToBrain(uniqueDeviceId, component, value) {
+  console.log("uniqueDeviceId: "+uniqueDeviceId);
+  console.log("component: "+component);
+  console.log("value: "+value);
   sendMessageToBrainFunction({ uniqueDeviceId, component, value })
     .catch((error) => {
       console.log('NOTIFICATION_FAILED', error.message);

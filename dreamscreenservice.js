@@ -3,9 +3,9 @@
 const BluePromise = require('bluebird');
 const DreamscreenClient = require('dreamscreen-node').Client;
 const client = new DreamscreenClient();
-const POWER_ON_INTEGER = 1;
 
 
+/* 
 client.on('light-new', (dreamscreen) => {
   console.log('discovered new light', dreamscreen.serialNumber);
 });
@@ -16,7 +16,8 @@ client.on('light-online', (dreamscreen) => {
 
 client.on('light-offline', (dreamscreen) => {
   console.log('light-offline', dreamscreen.serialNumber);
-});
+}); 
+*/
 
 client.on('listening', function () {
   var address = client.address();

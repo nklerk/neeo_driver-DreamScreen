@@ -48,6 +48,12 @@ __automate input selection and or Mode selection:__
 - no realtime status updates:
   NOTIFICATION_FAILED COMPONENTNAME_NOT_FOUND
 
+### 0.0.5
+- Code Cleanup
+
+### 0.0.4
+- Modules Cleanup
+
 ### 0.0.3
 - Fixed HDMI input change.
 

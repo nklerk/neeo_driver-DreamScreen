@@ -71,6 +71,6 @@ __automate input selection and or Mode selection:__
 
 
 # SPECIAL THANKS
-DreamScreen for supporting this project!
-Kyle Seconrd for writing the node mudule needed for this project. (https://github.com/ksecord/dreamscreen-node)
-Michael Vogt for helping me out and giving new insights.
+- DreamScreen for supporting this project!
+- Kyle Seconrd for writing the node mudule needed for this project. (https://github.com/ksecord/dreamscreen-node)
+- Michael Vogt for helping me out and giving new insights.

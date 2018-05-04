@@ -1,27 +1,19 @@
 'use strict';
 
-//const DreamscreenService = require('./dreamscreenservice');
 const dreamscreenService = require('./dreamscreenservice');
 const neeoapi = require('neeo-sdk');
 
-// the mobile app polls each 4500ms
-const DEVICE_POLL_TIME_MS = 4000;
+const DEVICE_POLL_TIME_MS = 1000;
 const MACRO_POWER_ON = 'POWER ON';
 const MACRO_POWER_OFF = 'POWER OFF';
 const MACRO_POWER_TOGGLE = 'POWER_TOGGLE';
-const MACRO_ALERT = 'ALERT';
-const INPUT_HDMI_1 = 'INPUT_HDMI_1';
-const INPUT_HDMI_2 = 'INPUT_HDMI_2';
-const INPUT_HDMI_3 = 'INPUT_HDMI_3';
-const MODE_MUSIC = 'MODE_MUSIC';
-const MODE_VIDEO = 'MODE_VIDEO';
-const MODE_AMBIENT = 'MODE_AMBIENT';
-const COMPONENT_BRIGHTNESS = 'BRIGHTNESS';
-const COMPONENT_POWER = 'POWER';
+const COMPONENT_BRIGHTNESS = 'brightness';
+const COMPONENT_POWER = 'power';
 
 const deviceState = neeoapi.buildDeviceState();
 let sendMessageToBrainFunction;
 let pollingIntervalId;
+let notificationcache = [];
 
 function setBrightness(deviceId, value) {
   return dreamscreenService.setBrightness(deviceId, value);
@@ -53,46 +45,37 @@ module.exports.onButtonPressed = (action, deviceId) => {
   switch (action) {
     case MACRO_POWER_ON:
       console.log(`Powering on ${deviceId}`);
-      return dreamscreenService.setPowerState(deviceId, "true"); //Change to correct function
+      return dreamscreenService.setPowerState(deviceId, "true");
     case MACRO_POWER_OFF:
       console.log(`Powering off ${deviceId}`);
-      return dreamscreenService.setPowerState(deviceId, "false"); //Change to correct function
-    case INPUT_HDMI_1:
-      console.log(`Set input to HDMI 1 on ${deviceId}`);
-      return dreamscreenService.setInput(deviceId, 0);  //Change to correct function
-    case INPUT_HDMI_2:
-      console.log(`Set input to HDMI 2 on ${deviceId}`);
-      return dreamscreenService.setInput(deviceId, 1); //Change to correct function
-    case INPUT_HDMI_3:
-      console.log(`Set input to HDMI 3 on ${deviceId}`);
-      return dreamscreenService.setInput(deviceId, 2); //Change to correct function
-    case MODE_MUSIC:
-      console.log(`Set mode to music on ${deviceId}`);
-      return dreamscreenService.setMode(deviceId, 2); //Change to correct function
-    case MODE_VIDEO:
-      console.log(`Set mode to video on ${deviceId}`);
-      return dreamscreenService.setMode(deviceId, 1); //Change to correct function
-    case MODE_AMBIENT:
-      console.log(`Set mode to ambient on ${deviceId}`);
-      return dreamscreenService.setMode(deviceId, 3); //Change to correct function
+      return dreamscreenService.setPowerState(deviceId, "false");
     default:
       console.log(`Unsupported button: ${action} for ${deviceId}`);
       return Promise.resolve(false);
   }
 };
 
+function isSK(obj) {
+  if ('productId' in obj && typeof(obj.productId) === 'number' && !isNaN(obj.productId)) {
+    if (obj.productId == 3){
+      return true;
+    }
+  } 
+  return false;
+}
+
 module.exports.discoverDevices = function() {
-  console.log('discovery call');
-  
+  console.log('discovery call'); 
   const allDevices = dreamscreenService.allDevices();
   return dreamscreenService.allDevices()
+    .filter(isSK)
     .map((deviceEntry) => {
       return {
         id: deviceEntry.serialNumber,
         name: tclean(deviceEntry.name),
         reachable: deviceEntry.isReachable
       };
-    });
+    }); 
 };
 
 // must be fixed at dreamscreen-node for name and groupname
@@ -102,22 +85,25 @@ function tclean(text){
 }
 
 function sendNotificationToBrain(uniqueDeviceId, component, value) {
-  console.log("uniqueDeviceId: "+uniqueDeviceId);
-  console.log("component: "+component);
-  console.log("value: "+value);
-  sendMessageToBrainFunction({ uniqueDeviceId, component, value })
+  if (notificationcache[uniqueDeviceId, component] !== value){    //exclude duplicate polling.
+    notificationcache[uniqueDeviceId, component] = value;
+    console.log("SEND_NOTIFICATION: ", uniqueDeviceId, component, value);
+    sendMessageToBrainFunction({ uniqueDeviceId, component, value })
     .catch((error) => {
       console.log('NOTIFICATION_FAILED', error.message);
     });
+  }
 }
 
 function pollAllDreamscreenDevices() {
-  console.log('polling all dreamscreen devices');
-  dreamscreenService.allDevices().forEach((dreamscreen) => {
-    sendNotificationToBrain(dreamscreen.serialNumber, COMPONENT_BRIGHTNESS, dreamscreen.brightness);
-    let powerstate = true;
-    if (dreamscreen.mode == 0 ) {powerstate = false};
-    sendNotificationToBrain(dreamscreen.serialNumber, COMPONENT_POWER, powerstate);
+  dreamscreenService.allDevices()
+    .filter(isSK)
+    .forEach((dreamscreen) => {
+      sendNotificationToBrain(dreamscreen.serialNumber, COMPONENT_BRIGHTNESS, dreamscreen.brightness);
+      
+      let powerstate = true;
+      if (dreamscreen.mode == 0 ) {powerstate = false};
+      sendNotificationToBrain(dreamscreen.serialNumber, COMPONENT_POWER, powerstate);
   });
 }
 
@@ -131,6 +117,7 @@ module.exports.initialise = function() {
     console.log('already initialised, ignore call');
     return false;
   }
-  console.log('initialise dreamscreen service, start polling');
+  console.log('initialise dreamscreen Sidekick service, start polling');
+  dreamscreenService.init();
   pollingIntervalId = setInterval(pollAllDreamscreenDevices, DEVICE_POLL_TIME_MS);
 };

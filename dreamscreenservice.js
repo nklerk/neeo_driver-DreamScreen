@@ -4,21 +4,6 @@ const BluePromise = require('bluebird');
 const DreamscreenClient = require('dreamscreen-node').Client;
 const client = new DreamscreenClient();
 
-
-/* 
-client.on('light-new', (dreamscreen) => {
-  console.log('discovered new light', dreamscreen.serialNumber);
-});
-
-client.on('light-online', (dreamscreen) => {
-  console.log('light-online', dreamscreen.serialNumber);
-});
-
-client.on('light-offline', (dreamscreen) => {
-  console.log('light-offline', dreamscreen.serialNumber);
-}); 
-*/
-
 client.on('listening', function () {
   var address = client.address();
   console.log(
@@ -27,8 +12,9 @@ client.on('listening', function () {
   );
 });
 
-
-client.init();
+module.exports.init = function(){
+  client.init();
+}
 
 module.exports.allDevices = function allDevices(){
   let devices = [];
@@ -37,7 +23,6 @@ module.exports.allDevices = function allDevices(){
   }
   return devices;
 }
-
 
 module.exports.getPowerState = function getPowerState(deviceId) {
   console.log("== Controller requested PowerState of: "+deviceId);
@@ -72,6 +57,21 @@ function setMode(deviceId, value) {
     }
   });
 } module.exports.setMode = setMode;
+
+function setAmbiMode(deviceId, value){
+  if (value < 0) {
+    client.light(deviceId).setAmbientModeType(0, function (err) {
+      if (err) { console.log(`${client.light(deviceId).name} set Ambient Mode Type ${value} failed`);   }
+    });
+  } else {
+    client.light(deviceId).setAmbientModeType(1, function (err) {
+      if (err) { console.log(`${client.light(deviceId).name} set Ambient Mode Type ${value} failed`);   }
+    });
+    client.light(deviceId).setAmbientShow(value, function (err) {
+      if (err) { console.log(`${client.light(deviceId).name} set Ambient Show ${value} failed`);   }
+    });
+  }
+} module.exports.setAmbiMode = setAmbiMode;
 
 module.exports.setBrightness = function setBrightness(deviceId, value) {
   console.log("== Controller requested to set Brightness of: "+deviceId);

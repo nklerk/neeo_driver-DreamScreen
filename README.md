@@ -48,6 +48,12 @@ __automate input selection and or Mode selection:__
 - no realtime status updates:
   NOTIFICATION_FAILED COMPONENTNAME_NOT_FOUND
 
+### 0.0.6
+- seperated each driver service (HD, 4K and Sidekick).
+- Fixed notification issues.
+- Initialize driver only when needed.
+- Added Ambient modes.
+
 ### 0.0.5
 - Code Cleanup
 
@@ -67,3 +73,4 @@ __automate input selection and or Mode selection:__
 # SPECIAL THANKS
 DreamScreen for supporting this project!
 Kyle Seconrd for writing the node mudule needed for this project. (https://github.com/ksecord/dreamscreen-node)
+Michael Vogt for helping me out and giving new insights.

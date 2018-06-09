@@ -1,8 +1,11 @@
 {
-  "name": "neeo_driver-DreamScreen",
+  "name": "neeo_driver-dreamscreen",
   "version": "0.0.6",
   "description": "NEEO driver, DreamScreen",
-  "repository": "https://github.com/nklerk/neeo_driver-DreamScreen",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nklerk/neeo_driver-DreamScreen.git"
+  },
   "license": "MIT",
   "private": false,
   "scripts": {
@@ -11,6 +14,12 @@
   "author": "Niels de Klerk",
   "dependencies": {
     "dreamscreen-node": "git://github.com/ksecord/dreamscreen-node.git",
-    "neeo-sdk": "^0.48.13"
-  }
+    "neeo-sdk": "^0.50.5"
+  },
+  "bugs": {
+    "url": "https://github.com/nklerk/neeo_driver-DreamScreen/issues"
+  },
+  "homepage": "https://github.com/nklerk/neeo_driver-DreamScreen#readme",
+  "main": "index.js",
+  "devDependencies": {}
 }

@@ -10,12 +10,20 @@ To find out more about NEEO, the Brain and "The Thinking Remote" checkout https:
 
 ## Getting started
 
-* Run `npm install` to install needed dependencies.
+* download the driver and unzip it (extract files).
+
+* For windows: Go to start -> Run, Type cmd and press ok.
+  with the command promt go to the extracted driver. i.e. `cd Downloads` then `cd neeo_driver-DreamScreen-master` depending on the location.
+  insode the folder run `npm install` to install needed dependencies.
+
+* For mac/linux open the console.
+  move to the location where the files are extracted. and run `npm install` to install needed dependencies.
+
+* Start up the driver by executing `node index.js`
 
 ### Driver
 
 __How to add a DreamScreen to NEEO:__
-1. Start up the driver by executing `node index.js`
 2. Connect to your NEEO Brain in the NEEO app
 3. Go to add device
 4. You should be able to find and add the DreamScreen by searching for _DreamScreen_
@@ -44,9 +52,6 @@ __automate input selection and or Mode selection:__
 
 # Versions
 
-## Known issues
-- no realtime status updates:
-  NOTIFICATION_FAILED COMPONENTNAME_NOT_FOUND
 
 ### 0.0.6
 - seperated each driver service (HD, 4K and Sidekick).

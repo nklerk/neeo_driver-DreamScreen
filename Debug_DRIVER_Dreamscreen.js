@@ -8,8 +8,8 @@ const HD4K = driver.buildHD4K();
 
 neeoapi
   .startServer({
-    brain: "10.2.1.64",
-    port: 63362,
+    brain: "10.2.1.61",
+    port: 6336,
     name: "DreamscreenDriver",
     devices: [SK, HD4K]
   })

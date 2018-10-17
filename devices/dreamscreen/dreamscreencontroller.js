@@ -63,13 +63,13 @@ function onButtonPressed(action, deviceId) {
       return dreamscreenService.setPowerState(deviceId, false);
     case INPUT_HDMI_1:
       console.log(`Set input to HDMI 1 on ${deviceId}`);
-      return dreamscreenService.setInput(deviceId, dsConst.INPUT_HDMI_1);
+      return dreamscreenService.setInput(deviceId, dsConst.HDMIINPUT_1);
     case INPUT_HDMI_2:
       console.log(`Set input to HDMI 2 on ${deviceId}`);
-      return dreamscreenService.setInput(deviceId, dsConst.INPUT_HDMI_2);
+      return dreamscreenService.setInput(deviceId, dsConst.HDMIINPUT_2);
     case INPUT_HDMI_3:
       console.log(`Set input to HDMI 3 on ${deviceId}`);
-      return dreamscreenService.setInput(deviceId, dsConst.INPUT_HDMI_3);
+      return dreamscreenService.setInput(deviceId, dsConst.HDMIINPUT_3);
     case MODE_MUSIC:
       console.log(`Set mode to music on ${deviceId}`);
       return dreamscreenService.setMode(deviceId, dsConst.MODE_MUSIC);
@@ -166,5 +166,5 @@ function tclean(text) {
 }
 
 function initialise() {
-  dreamscreenService.init();
+  return dreamscreenService.init();
 }

@@ -49,7 +49,6 @@ client.on("light-offline", function(light) {
 });
 
 client.on("listening", function() {
-  clientInitiated = true;
   const address = client.address();
   console.log(`EVENT:  Started DreamScreen listening on ${address.address}:${address.port}`);
 });
@@ -61,6 +60,10 @@ client.on("error", error => {
 module.exports.init = function() {
   if (!clientInitiated) {
     client.init();
+    clientInitiated = true;
+    return true;
+  } else {
+    return false;
   }
 };
 

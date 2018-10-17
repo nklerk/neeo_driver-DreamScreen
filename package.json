@@ -9,7 +9,7 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha --exit \"test/**/*.js\"",
     "start": "neeo-sdk start"
   },
   "author": "Niels de Klerk",
@@ -22,5 +22,11 @@
   },
   "homepage": "https://github.com/nklerk/neeo_driver-DreamScreen#readme",
   "main": "index.js",
-  "devDependencies": {}
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "jshint": "^2.9.6",
+    "mocha": "^5.2.0",
+    "mockery": "^2.1.0",
+    "sinon": "^6.3.5"
+  }
 }

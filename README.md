@@ -19,7 +19,7 @@ To find out more about NEEO, the Brain and "The Thinking Remote" checkout https:
 - For mac/linux open the console.
   move to the location where the files are extracted. and run `npm install` to install needed dependencies.
 
-- Start up the driver by executing `node index.js`
+- Start up the driver by executing `npm start`
 
 ### Driver
 
@@ -54,7 +54,12 @@ You can add the following buttons:
 
 # Versions
 
-### 0.2.0
+### 0.1.1
+
+- Fixed instructions in the readme.md
+- Fixed HDMI input issues.
+
+### 0.1.0
 
 - Code restructure.
 - Code cleanup.
